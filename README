@@ -1,0 +1,11 @@
+http://en.wikipedia.org/wiki/Zebu -- A working cattle
+
+Also a cowbuilder management tool
+
+Main window lists all cowbuilders
+- create new
+- update
+- delete
+- login
+
+Add special .name file to top of cowbuilder to set a human readable name
