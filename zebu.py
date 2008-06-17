@@ -24,20 +24,32 @@ scrolled.add(treeview)
 vbox.pack_start(scrolled)
 
 def spawn(command):
-    (model, it) = treeview.get_selection().get_selected()
     title = "Cowshell" #in %s" % model[it][1]
     args = (command % (title, model[it][0])).split(" ")
     gobject.spawn_async(argv=args, flags=gobject.SPAWN_SEARCH_PATH)
 
+def spawn_cowbuilder(option):
+    (model, it) = treeview.get_selection().get_selected()
+    row = model[it]
+    args = (
+        "gnome-terminal",
+        "-t", "'Cowshell in %s'" % row[1],
+        "-x", "sudo", "sh", "-c",
+        "cowbuilder %s --basepath %s ; read -n 1 -p '[done, press any key]'" % (option, row[0])
+        )
+    gobject.spawn_async(argv=args, flags=gobject.SPAWN_SEARCH_PATH)
+
 bbox = gtk.HButtonBox()
+
 button = gtk.Button("Update");
 def on_update_clicked(button):
-    spawn("gnome-terminal -t %s -x sudo cowbuilder --update --basepath %s")
+    spawn_cowbuilder("--update")
 button.connect("clicked", on_update_clicked)
 bbox.add(button)
+
 button = gtk.Button("Login")
 def on_login_clicked(button):
-    spawn("gnome-terminal -t %s -x sudo cowbuilder --login --basepath %s")
+    spawn_cowbuilder("--login")
 button.connect("clicked", on_login_clicked)
 bbox.add(button)
 vbox.pack_start(bbox, expand=False)
