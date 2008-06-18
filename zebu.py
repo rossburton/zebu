@@ -16,6 +16,7 @@ scrolled.set_shadow_type(gtk.SHADOW_IN)
 
 # Full path, short name, description
 store = gtk.ListStore(gobject.TYPE_STRING, gobject.TYPE_STRING, gobject.TYPE_STRING)
+store.set_sort_column_id(1, gtk.SORT_ASCENDING)
 
 treeview = gtk.TreeView(store)
 column = gtk.TreeViewColumn("Name", gtk.CellRendererText(), text=1)
