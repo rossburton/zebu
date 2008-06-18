@@ -1,6 +1,6 @@
 #! /usr/bin/python
 
-import gobject, gtk, os
+import gobject, gtk, os, re
 
 window = gtk.Window()
 window.set_title("Zebu")
@@ -14,11 +14,13 @@ scrolled = gtk.ScrolledWindow()
 scrolled.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
 scrolled.set_shadow_type(gtk.SHADOW_IN)
 
-# Full path, short name
-store = gtk.ListStore(gobject.TYPE_STRING, gobject.TYPE_STRING)
+# Full path, short name, description
+store = gtk.ListStore(gobject.TYPE_STRING, gobject.TYPE_STRING, gobject.TYPE_STRING)
 
 treeview = gtk.TreeView(store)
 column = gtk.TreeViewColumn("Name", gtk.CellRendererText(), text=1)
+treeview.append_column(column)
+column = gtk.TreeViewColumn("Description", gtk.CellRendererText(), text=2)
 treeview.append_column(column)
 scrolled.add(treeview)
 vbox.pack_start(scrolled)
@@ -54,15 +56,35 @@ button.connect("clicked", on_login_clicked)
 bbox.add(button)
 vbox.pack_start(bbox, expand=False)
 
-COW_DIR = "/var/cache/pbuilder"
 
+COW_DIR = "/var/cache/pbuilder"
 for name in os.listdir(COW_DIR):
     if not name.endswith(".cow"):
         continue
+
     path = os.path.join(COW_DIR, name)
     if not os.path.isdir(path):
         continue
-    store.set(store.append(), 0, path, 1, name)
+
+    desc = ""
+    try:
+        lsbre = re.compile(r'DISTRIB_DESCRIPTION="(.+)"')
+        for l in open(os.path.join(path, "etc", "lsb-release")):
+            m = lsbre.match(l)
+            if m:
+                desc = m.group(1)
+                break;
+    except IOError:
+        pass
+    
+    if not desc:
+        try:
+            deb_version = open(os.path.join(path, "etc", "debian_version")).readline().strip()
+            desc = "Debian %s" % deb_version
+        except IOError:
+            pass
+    
+    store.set(store.append(), 0, path, 1, name, 2, desc)
 
 window.show_all()
 gtk.main()
