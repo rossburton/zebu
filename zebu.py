@@ -30,11 +30,6 @@ treeview.append_column(column)
 scrolled.add(treeview)
 vbox.pack_start(scrolled)
 
-def spawn(command):
-    title = "Cowshell" #in %s" % model[it][COL_NAME]
-    args = (command % (title, model[it][COL_PATH])).split(" ")
-    gobject.spawn_async(argv=args, flags=gobject.SPAWN_SEARCH_PATH)
-
 def spawn_cowbuilder(option):
     (model, it) = treeview.get_selection().get_selected()
     row = model[it]
