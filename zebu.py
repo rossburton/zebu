@@ -16,20 +16,23 @@ scrolled.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
 scrolled.set_shadow_type(gtk.SHADOW_IN)
 
 # Full path, short name, description
+(COL_PATH,
+ COL_NAME,
+ COL_DESC) = range(0, 3)
 store = gtk.ListStore(gobject.TYPE_STRING, gobject.TYPE_STRING, gobject.TYPE_STRING)
-store.set_sort_column_id(1, gtk.SORT_ASCENDING)
+store.set_sort_column_id(COL_NAME, gtk.SORT_ASCENDING)
 
 treeview = gtk.TreeView(store)
-column = gtk.TreeViewColumn("Name", gtk.CellRendererText(), text=1)
+column = gtk.TreeViewColumn("Name", gtk.CellRendererText(), text=COL_NAME)
 treeview.append_column(column)
-column = gtk.TreeViewColumn("Description", gtk.CellRendererText(), text=2)
+column = gtk.TreeViewColumn("Description", gtk.CellRendererText(), text=COL_DESC)
 treeview.append_column(column)
 scrolled.add(treeview)
 vbox.pack_start(scrolled)
 
 def spawn(command):
-    title = "Cowshell" #in %s" % model[it][1]
-    args = (command % (title, model[it][0])).split(" ")
+    title = "Cowshell" #in %s" % model[it][COL_NAME]
+    args = (command % (title, model[it][COL_PATH])).split(" ")
     gobject.spawn_async(argv=args, flags=gobject.SPAWN_SEARCH_PATH)
 
 def spawn_cowbuilder(option):
@@ -37,9 +40,9 @@ def spawn_cowbuilder(option):
     row = model[it]
     args = (
         "gnome-terminal",
-        "-t", "'Cowshell in %s'" % row[1],
+        "-t", "'Cowshell in %s'" % row[COL_NAME],
         "-x", "sudo", "sh", "-c",
-        "cowbuilder %s --basepath %s ; read -n 1 -p '[done, press any key]'" % (option, row[0])
+        "cowbuilder %s --basepath %s ; read -n 1 -p '[done, press any key]'" % (option, row[COL_PATH])
         )
     gobject.spawn_async(argv=args, flags=gobject.SPAWN_SEARCH_PATH)
 
@@ -86,7 +89,10 @@ for name in os.listdir(COW_DIR):
         except IOError:
             pass
     
-    store.set(store.append(), 0, path, 1, name, 2, desc)
+    store.set(store.append(),
+              COL_PATH, path,
+              COL_NAME, name,
+              COL_DESC, desc)
 
 window.show_all()
 gtk.main()
