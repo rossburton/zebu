@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Zebu
+Comment=Manage cowbuilder chroots
+Exec=zebu
+Icon=zebu
+StartupNotify=true
+Terminal=false
+Type=Application
+Categories=GTK;Development;
