@@ -2,6 +2,8 @@
 
 import gobject, gtk, os, re
 
+gtk.window_set_default_icon_name("zebu")
+
 window = gtk.Window()
 window.set_title("Zebu Cowbuilder Manager")
 window.set_default_size(300, 250)
