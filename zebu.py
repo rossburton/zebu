@@ -3,7 +3,8 @@
 import gobject, gtk, os, re
 
 window = gtk.Window()
-window.set_title("Zebu")
+window.set_title("Zebu Cowbuilder Manager")
+window.set_default_size(300, 250)
 window.set_border_width(8)
 window.connect("delete-event", gtk.main_quit)
 
