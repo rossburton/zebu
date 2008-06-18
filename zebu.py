@@ -46,6 +46,12 @@ treeview.append_column(column)
 scrolled.add(treeview)
 vbox.pack_start(scrolled)
 
+def sync_selection(selection, button):
+    """
+    Set the sensitivity of a button based on the treeview selection.
+    """
+    button.set_sensitive(selection.count_selected_rows() != 0)
+
 def spawn_cowbuilder(option):
     (model, it) = treeview.get_selection().get_selected()
     row = model[it]
@@ -63,13 +69,16 @@ button = gtk.Button("Update");
 def on_update_clicked(button):
     spawn_cowbuilder("--update")
 button.connect("clicked", on_update_clicked)
+treeview.get_selection().connect("changed", sync_selection, button)
 bbox.add(button)
 
 button = gtk.Button("Login")
 def on_login_clicked(button):
     spawn_cowbuilder("--login")
 button.connect("clicked", on_login_clicked)
+treeview.get_selection().connect("changed", sync_selection, button)
 bbox.add(button)
+
 vbox.pack_start(bbox, expand=False)
 
 
