@@ -35,7 +35,7 @@ def spawn_cowbuilder(option):
     row = model[it]
     args = (
         "gnome-terminal",
-        "-t", "'Cowshell in %s'" % row[COL_NAME],
+        "-t", "Cowshell in %s" % row[COL_NAME],
         "-x", "sudo", "sh", "-c",
         "cowbuilder %s --basepath %s ; read -n 1 -p '[done, press any key]'" % (option, row[COL_PATH])
         )
