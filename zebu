@@ -79,6 +79,15 @@ button.connect("clicked", on_login_clicked)
 treeview.get_selection().connect("changed", sync_selection, button)
 bbox.add(button)
 
+button = gtk.Button("Browse")
+def on_browse_clicked(button):
+    (model, it) = treeview.get_selection().get_selected()
+    row = model[it]
+    gobject.spawn_async(("nautilus", row[COL_PATH]), flags=gobject.SPAWN_SEARCH_PATH)
+button.connect("clicked", on_browse_clicked)
+treeview.get_selection().connect("changed", sync_selection, button)
+bbox.add(button)
+
 vbox.pack_start(bbox, expand=False)
 
 
