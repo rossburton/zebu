@@ -70,6 +70,21 @@ def spawn_cowbuilder(option, name=None, basepath=None):
 bbox = gtk.HButtonBox()
 bbox.set_spacing(6)
 
+button = gtk.Button("New");
+def on_new_clicked(button):
+    import NewCowDialog
+    dialog = NewCowDialog.NewCowDialog()
+    if dialog.run() == gtk.RESPONSE_ACCEPT:
+        name = dialog.get_name()
+        details = dialog.get_details()
+        dialog.destroy()
+        spawn_cowbuilder("--create --mirror %s --distribution %s --components \"%s\"" % details,
+                         name, "/var/cache/pbuilder/%s.cow" % name)
+    else:
+        dialog.destroy()
+button.connect("clicked", on_new_clicked)
+bbox.add(button)
+
 button = gtk.Button("Update");
 def on_update_clicked(button):
     spawn_cowbuilder("--update")
