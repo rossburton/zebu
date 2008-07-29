@@ -54,8 +54,8 @@ class NewCowDialog(gtk.Dialog):
             store.set(store.append(),
                       0, release[0],
                       1, distro[0],
-                      2, distro[1],
-                      3, release[2])
+                      2, release[2],
+                      3, distro[1])
 
         self.distro_combo = combo = gtk.ComboBox(store)
         renderer = gtk.CellRendererText()
