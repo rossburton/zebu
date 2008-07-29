@@ -73,7 +73,7 @@ bbox.set_spacing(6)
 button = gtk.Button("New");
 def on_new_clicked(button):
     from zebu import NewCowDialog
-    dialog = NewCowDialog.NewCowDialog()
+    dialog = NewCowDialog.NewCowDialog(window)
     if dialog.run() == gtk.RESPONSE_ACCEPT:
         name = dialog.get_name()
         details = dialog.get_details()
