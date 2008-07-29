@@ -81,7 +81,7 @@ class NewCowDialog(gtk.Dialog):
         label.set_mnemonic_widget(combo)
 
         self.add_buttons(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT,
-                         gtk.STOCK_ADD, gtk.RESPONSE_ACCEPT)
+                         gtk.STOCK_NEW, gtk.RESPONSE_ACCEPT)
 
     def get_name(self):
         return self.name_entry.get_text()
