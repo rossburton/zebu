@@ -33,7 +33,7 @@ releases = (
 
 class NewCowDialog(gtk.Dialog):
     def __init__(self, parent=None):
-        gtk.Dialog.__init__(self, "New Cowbuilder", parent)
+        gtk.Dialog.__init__(self, "Create New Cowbuilder", parent)
         self.set_resizable(False)
         
         def make_label(text):
