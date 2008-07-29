@@ -52,18 +52,23 @@ def sync_selection(selection, button):
     """
     button.set_sensitive(selection.count_selected_rows() != 0)
 
-def spawn_cowbuilder(option):
-    (model, it) = treeview.get_selection().get_selected()
-    row = model[it]
+def spawn_cowbuilder(option, name=None, basepath=None):
+    if not name:
+        (model, it) = treeview.get_selection().get_selected()
+        row = model[it]
+        name = row[COL_NAME]
+        basepath = row[COL_PATH]
+
     args = (
         "gnome-terminal",
-        "-t", "Cowshell in %s" % row[COL_NAME],
+        "-t", "Cowshell in %s" % name,
         "-x", "sudo", "sh", "-c",
-        "cowbuilder %s --basepath %s ; read -n 1 -p '[done, press any key]'" % (option, row[COL_PATH])
+        "cowbuilder %s --basepath %s ; read -n 1 -p '[done, press any key]'" % (option, basepath)
         )
     gobject.spawn_async(argv=args, flags=gobject.SPAWN_SEARCH_PATH)
 
 bbox = gtk.HButtonBox()
+bbox.set_spacing(6)
 
 button = gtk.Button("Update");
 def on_update_clicked(button):
