@@ -64,6 +64,7 @@ def spawn_cowbuilder(option):
     gobject.spawn_async(argv=args, flags=gobject.SPAWN_SEARCH_PATH)
 
 bbox = gtk.HButtonBox()
+bbox.set_spacing(6)
 
 button = gtk.Button("Update");
 def on_update_clicked(button):
