@@ -90,6 +90,7 @@ def sync_selection(selection, button):
 
 def task_done(pid, status):
     window.window.set_cursor(None)
+    # TODO: activate widgets
     update_cowbuilders()
 
 def spawn_cowbuilder(option, block=False, name=None, basepath=None):
@@ -112,6 +113,8 @@ def spawn_cowbuilder(option, block=False, name=None, basepath=None):
     if block:
         flags |= gobject.SPAWN_DO_NOT_REAP_CHILD
         window.window.set_cursor(gtk.gdk.Cursor(gtk.gdk.WATCH))
+        # TODO: disable widgets
+    
     pid = gobject.spawn_async(argv=args, flags=flags)[0]
     
     if block:
