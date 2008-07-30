@@ -46,6 +46,42 @@ treeview.append_column(column)
 scrolled.add(treeview)
 vbox.pack_start(scrolled)
 
+def update_cowbuilders():
+    store.clear()
+    COW_DIR = "/var/cache/pbuilder"
+    for name in os.listdir(COW_DIR):
+        if not name.endswith(".cow"):
+            continue
+        
+        path = os.path.join(COW_DIR, name)
+        if not os.path.isdir(path):
+            continue
+        
+        desc = ""
+        try:
+            lsbre = re.compile(r'DISTRIB_DESCRIPTION="(.+)"')
+            for l in open(os.path.join(path, "etc", "lsb-release")):
+                m = lsbre.match(l)
+                if m:
+                    desc = m.group(1)
+                    break;
+        except IOError:
+            pass
+        
+        if not desc:
+            try:
+                deb_version = open(os.path.join(path, "etc", "debian_version")).readline().strip()
+                desc = "Debian %s" % deb_version
+            except IOError:
+                pass
+            
+        store.set(store.append(),
+                  COL_PATH, path,
+                  COL_NAME, name,
+                  COL_DESC, desc)
+
+update_cowbuilders()
+
 def sync_selection(selection, button):
     """
     Set the sensitivity of a button based on the treeview selection.
@@ -54,6 +90,7 @@ def sync_selection(selection, button):
 
 def task_done(pid, status):
     window.window.set_cursor(None)
+    update_cowbuilders()
 
 def spawn_cowbuilder(option, block=False, name=None, basepath=None):
     # TODO: Instead of using gnome-terminal, embed a VTE widget
@@ -122,39 +159,6 @@ treeview.get_selection().connect("changed", sync_selection, button)
 bbox.add(button)
 
 vbox.pack_start(bbox, expand=False)
-
-
-COW_DIR = "/var/cache/pbuilder"
-for name in os.listdir(COW_DIR):
-    if not name.endswith(".cow"):
-        continue
-
-    path = os.path.join(COW_DIR, name)
-    if not os.path.isdir(path):
-        continue
-
-    desc = ""
-    try:
-        lsbre = re.compile(r'DISTRIB_DESCRIPTION="(.+)"')
-        for l in open(os.path.join(path, "etc", "lsb-release")):
-            m = lsbre.match(l)
-            if m:
-                desc = m.group(1)
-                break;
-    except IOError:
-        pass
-    
-    if not desc:
-        try:
-            deb_version = open(os.path.join(path, "etc", "debian_version")).readline().strip()
-            desc = "Debian %s" % deb_version
-        except IOError:
-            pass
-    
-    store.set(store.append(),
-              COL_PATH, path,
-              COL_NAME, name,
-              COL_DESC, desc)
 
 window.show_all()
 gtk.main()
