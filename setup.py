@@ -10,6 +10,8 @@ setup(name='Zebu',
       url="http://www.burtonini.com/",
       
       scripts=["zebu"],
+      package_dir={'zebu': 'src'},
+      packages=['zebu'],
       data_files=[
         ("share/applications", ["zebu.desktop"]),
         ("share/icons/hicolor/16x16/apps", ["icons/16x16/zebu.png"]),

@@ -46,13 +46,54 @@ treeview.append_column(column)
 scrolled.add(treeview)
 vbox.pack_start(scrolled)
 
+def update_cowbuilders():
+    store.clear()
+    COW_DIR = "/var/cache/pbuilder"
+    for name in os.listdir(COW_DIR):
+        if not name.endswith(".cow"):
+            continue
+        
+        path = os.path.join(COW_DIR, name)
+        if not os.path.isdir(path):
+            continue
+        
+        desc = ""
+        try:
+            lsbre = re.compile(r'DISTRIB_DESCRIPTION="(.+)"')
+            for l in open(os.path.join(path, "etc", "lsb-release")):
+                m = lsbre.match(l)
+                if m:
+                    desc = m.group(1)
+                    break;
+        except IOError:
+            pass
+        
+        if not desc:
+            try:
+                deb_version = open(os.path.join(path, "etc", "debian_version")).readline().strip()
+                desc = "Debian %s" % deb_version
+            except IOError:
+                pass
+            
+        store.set(store.append(),
+                  COL_PATH, path,
+                  COL_NAME, name,
+                  COL_DESC, desc)
+
+update_cowbuilders()
+
 def sync_selection(selection, button):
     """
     Set the sensitivity of a button based on the treeview selection.
     """
     button.set_sensitive(selection.count_selected_rows() != 0)
 
-def spawn_cowbuilder(option, name=None, basepath=None):
+def task_done(pid, status):
+    window.window.set_cursor(None)
+    update_cowbuilders()
+
+def spawn_cowbuilder(option, block=False, name=None, basepath=None):
+    # TODO: Instead of using gnome-terminal, embed a VTE widget
     if not name:
         (model, it) = treeview.get_selection().get_selected()
         row = model[it]
@@ -61,25 +102,49 @@ def spawn_cowbuilder(option, name=None, basepath=None):
 
     args = (
         "gnome-terminal",
+        "--disable-factory",
         "-t", "Cowshell in %s" % name,
         "-x", "sudo", "sh", "-c",
         "cowbuilder %s --basepath %s ; read -n 1 -p '[done, press any key]'" % (option, basepath)
         )
-    gobject.spawn_async(argv=args, flags=gobject.SPAWN_SEARCH_PATH)
+
+    flags = gobject.SPAWN_SEARCH_PATH
+    if block:
+        flags |= gobject.SPAWN_DO_NOT_REAP_CHILD
+        window.window.set_cursor(gtk.gdk.Cursor(gtk.gdk.WATCH))
+    pid = gobject.spawn_async(argv=args, flags=flags)[0]
+    
+    if block:
+        gobject.child_watch_add(pid, task_done)
 
 bbox = gtk.HButtonBox()
 bbox.set_spacing(6)
 
+button = gtk.Button("New");
+def on_new_clicked(button):
+    from zebu import NewCowDialog
+    dialog = NewCowDialog.NewCowDialog(window)
+    if dialog.run() == gtk.RESPONSE_ACCEPT:
+        name = dialog.get_name()
+        details = dialog.get_details()
+        dialog.destroy()
+        spawn_cowbuilder("--create --mirror %s --distribution %s --components \"%s\"" % details,
+                         True, name, "/var/cache/pbuilder/%s.cow" % name)
+    else:
+        dialog.destroy()
+button.connect("clicked", on_new_clicked)
+bbox.add(button)
+
 button = gtk.Button("Update");
 def on_update_clicked(button):
-    spawn_cowbuilder("--update")
+    spawn_cowbuilder("--update", True)
 button.connect("clicked", on_update_clicked)
 treeview.get_selection().connect("changed", sync_selection, button)
 bbox.add(button)
 
 button = gtk.Button("Login")
 def on_login_clicked(button):
-    spawn_cowbuilder("--login")
+    spawn_cowbuilder("--login", False)
 button.connect("clicked", on_login_clicked)
 treeview.get_selection().connect("changed", sync_selection, button)
 bbox.add(button)
@@ -94,39 +159,6 @@ treeview.get_selection().connect("changed", sync_selection, button)
 bbox.add(button)
 
 vbox.pack_start(bbox, expand=False)
-
-
-COW_DIR = "/var/cache/pbuilder"
-for name in os.listdir(COW_DIR):
-    if not name.endswith(".cow"):
-        continue
-
-    path = os.path.join(COW_DIR, name)
-    if not os.path.isdir(path):
-        continue
-
-    desc = ""
-    try:
-        lsbre = re.compile(r'DISTRIB_DESCRIPTION="(.+)"')
-        for l in open(os.path.join(path, "etc", "lsb-release")):
-            m = lsbre.match(l)
-            if m:
-                desc = m.group(1)
-                break;
-    except IOError:
-        pass
-    
-    if not desc:
-        try:
-            deb_version = open(os.path.join(path, "etc", "debian_version")).readline().strip()
-            desc = "Debian %s" % deb_version
-        except IOError:
-            pass
-    
-    store.set(store.append(),
-              COL_PATH, path,
-              COL_NAME, name,
-              COL_DESC, desc)
 
 window.show_all()
 gtk.main()
