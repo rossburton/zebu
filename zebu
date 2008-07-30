@@ -56,6 +56,7 @@ def task_done(pid, status):
     window.window.set_cursor(None)
 
 def spawn_cowbuilder(option, block=False, name=None, basepath=None):
+    # TODO: Instead of using gnome-terminal, embed a VTE widget
     if not name:
         (model, it) = treeview.get_selection().get_selected()
         row = model[it]
