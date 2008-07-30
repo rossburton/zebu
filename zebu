@@ -52,7 +52,10 @@ def sync_selection(selection, button):
     """
     button.set_sensitive(selection.count_selected_rows() != 0)
 
-def spawn_cowbuilder(option, name=None, basepath=None):
+def task_done(pid, status):
+    window.window.set_cursor(None)
+
+def spawn_cowbuilder(option, block=False, name=None, basepath=None):
     if not name:
         (model, it) = treeview.get_selection().get_selected()
         row = model[it]
@@ -61,11 +64,20 @@ def spawn_cowbuilder(option, name=None, basepath=None):
 
     args = (
         "gnome-terminal",
+        "--disable-factory",
         "-t", "Cowshell in %s" % name,
         "-x", "sudo", "sh", "-c",
         "cowbuilder %s --basepath %s ; read -n 1 -p '[done, press any key]'" % (option, basepath)
         )
-    gobject.spawn_async(argv=args, flags=gobject.SPAWN_SEARCH_PATH)
+
+    flags = gobject.SPAWN_SEARCH_PATH
+    if block:
+        flags |= gobject.SPAWN_DO_NOT_REAP_CHILD
+        window.window.set_cursor(gtk.gdk.Cursor(gtk.gdk.WATCH))
+    pid = gobject.spawn_async(argv=args, flags=flags)[0]
+    
+    if block:
+        gobject.child_watch_add(pid, task_done)
 
 bbox = gtk.HButtonBox()
 bbox.set_spacing(6)
@@ -79,7 +91,7 @@ def on_new_clicked(button):
         details = dialog.get_details()
         dialog.destroy()
         spawn_cowbuilder("--create --mirror %s --distribution %s --components \"%s\"" % details,
-                         name, "/var/cache/pbuilder/%s.cow" % name)
+                         True, name, "/var/cache/pbuilder/%s.cow" % name)
     else:
         dialog.destroy()
 button.connect("clicked", on_new_clicked)
@@ -87,14 +99,14 @@ bbox.add(button)
 
 button = gtk.Button("Update");
 def on_update_clicked(button):
-    spawn_cowbuilder("--update")
+    spawn_cowbuilder("--update", True)
 button.connect("clicked", on_update_clicked)
 treeview.get_selection().connect("changed", sync_selection, button)
 bbox.add(button)
 
 button = gtk.Button("Login")
 def on_login_clicked(button):
-    spawn_cowbuilder("--login")
+    spawn_cowbuilder("--login", False)
 button.connect("clicked", on_login_clicked)
 treeview.get_selection().connect("changed", sync_selection, button)
 bbox.add(button)
