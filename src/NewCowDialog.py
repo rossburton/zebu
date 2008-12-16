@@ -30,6 +30,8 @@ releases = (
     ("Ubuntu 6.10 (Edgy Eft)", "ubuntu", "edgy"),
     ("Ubuntu 6.06 (Dapper Drake)", "ubuntu", "dapper"),
 )
+# TODO: add "extra sources" so you can build an experimental chroot, company
+# repositories, etc
 
 class NewCowDialog(gtk.Dialog):
     def __init__(self, parent=None):
