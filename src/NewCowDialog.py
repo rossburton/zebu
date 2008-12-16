@@ -19,7 +19,7 @@ distros = {
     "ubuntu": ("http://archive.ubuntu.com/ubuntu", "main universe")
     }
 releases = (
-    ("Debian Unstable (Sid)", "debian", "unstable"),
+    ("Debian Unstable (Sid)", "debian", "sid"),
     ("Debian Testing (Lenny)", "debian", "lenny"),
     ("Debian 4.0 (Etch)", "debian", "etch"),
     ("Debian 3.1 (Sarge)", "debian", "sarge"),
