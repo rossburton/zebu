@@ -3,7 +3,7 @@
 from distutils.core import setup
 
 setup(name='Zebu',
-      version="0.1",
+      version="0.2",
       description="Cowbuilder Manager",
       author="Ross Burton",
       author_email="ross@burtonini.com",
