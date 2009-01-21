@@ -23,6 +23,7 @@ releases = (
     ("Debian Testing (Lenny)", "debian", "lenny"),
     ("Debian 4.0 (Etch)", "debian", "etch"),
     ("Debian 3.1 (Sarge)", "debian", "sarge"),
+    ("Ubuntu 9.04 (Jaunty Jackalope)", "ubuntu", "jaunty"),
     ("Ubuntu 8.10 (Intrepid Ibex)", "ubuntu", "intrepid"),
     ("Ubuntu 8.04 (Hardy Heron)", "ubuntu", "hardy"),
     ("Ubuntu 7.10 (Gutsy Gibbon)", "ubuntu", "gutsy"),
